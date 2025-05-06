@@ -5,6 +5,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
+#include <filesystem>
+
 #include "stb_image_resize2.h"
 #include <iostream>
 #include <fstream>
@@ -25,18 +27,35 @@ char pixelToChar(unsigned char r, unsigned char g, unsigned char b) {
 int main() {
 
     // stbi_load jaoks vajalikud parameetrid
-    int width, height, channels;
+    int width, height, channels, out_width;
 
     // Võtab kasutaja failisisendi
-    string in;
+    string in, out_filename;
     cout << "Palun sisesta failinimi koos failimuutujaga): ";
     cin >> in;
+
+    // Check if file exists
+    if (!filesystem::exists(in)) {
+        cerr << "Faili ei leitud: " << in << endl;
+        return 1;
+    }
 
     // Laeb pikslite andmed ühte muutujasse
     unsigned char* data = stbi_load(in.c_str(), &width, &height, &channels, 3);
 
-    // Fikseeritud suurused väljundi jaoks, saab vajadusel muuta
-    int out_width = 540;
+    if (!data) {
+        cerr << "Vigane sisend." << endl;
+        return 1;
+    }
+
+    //laiuse küsimine
+    cout << "Sisesta soovitud laiuse väärtus : ";
+    cin >> out_width;
+    if (out_width <= 0) {
+        out_width = 540;
+        cout << "Vale sisestus. Kasutan vaikeväärtust: " << out_width << "\n";
+    }
+
     int out_height = (height * out_width) / width / 2; // kõrgus on siin dünaamiline vastavalt pildile
 
     // Kuna ASCII sümbolid pole ruudud (nagu on piksel), tuleb pikslite andmed muuta väiksemaks stb resize meetodiga,
@@ -45,20 +64,19 @@ int main() {
     stbir_resize_uint8_srgb(data, width, height, 0, resized, out_width, out_height, 0, STBIR_RGB);
     stbi_image_free(data);
 
-    if (!data) {
-        cerr << "Vigane sisend. Kas fail on pilt?" << endl;
-        return 1;
+    // soovitud output faili nime küsimine
+    cout << "Soovid määrata väljundfaili nime? (vajuta Enter vahelejätmiseks): ";
+    cin.ignore();
+    getline(cin, out_filename);
+
+    if (out_filename.empty()) {
+        size_t dotPos = in.find_last_of('.');
+        out_filename = (dotPos != string::npos ? in.substr(0, dotPos) : in) + ".txt";
+    } else if (out_filename.find(".txt") == string::npos) {
+        out_filename += ".txt";
     }
 
-    // Output loomine, on sama nimega mis sisend, aga .txt tüüpi.
-    string output = in;
-    size_t inputDot = in.find_last_of('.');
-    if (inputDot != string::npos) {
-        output = output.substr(0, inputDot);
-    }
-    output += ".txt";
-
-    ofstream out(output);
+    ofstream out(out_filename);
     for (int y = 0; y < out_height; y += 5) {
         for (int x = 0; x < out_width; x += 2) {
             int i = (y * out_width + x) * 3;
