@@ -1,3 +1,3 @@
-C:/Users/antsovma/Töölaud/ascii-art-gen/cmake-build-debug/CMakeFiles/ascii_art_gen.dir
-C:/Users/antsovma/Töölaud/ascii-art-gen/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/antsovma/Töölaud/ascii-art-gen/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/gamae/Documents/GitHub/ascii-art-gen/cmake-build-debug/CMakeFiles/ascii_art_gen.dir
+/Users/gamae/Documents/GitHub/ascii-art-gen/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/gamae/Documents/GitHub/ascii-art-gen/cmake-build-debug/CMakeFiles/rebuild_cache.dir

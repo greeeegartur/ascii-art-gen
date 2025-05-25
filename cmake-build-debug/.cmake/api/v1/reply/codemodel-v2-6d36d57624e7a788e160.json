@@ -6,7 +6,7 @@
 			[
 				{
 					"build" : ".",
-					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
 					"minimumCMakeVersion" : 
 					{
 						"string" : "3.31"
@@ -39,7 +39,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "ascii_art_gen::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-ascii_art_gen-Debug-d7837b74cf30162dee37.json",
+					"jsonFile" : "target-ascii_art_gen-Debug-d818cc743ff621cc0760.json",
 					"name" : "ascii_art_gen",
 					"projectIndex" : 0
 				}
@@ -49,8 +49,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "C:/Users/antsovma/T\u00f6\u00f6laud/ascii-art-gen/cmake-build-debug",
-		"source" : "C:/Users/antsovma/T\u00f6\u00f6laud/ascii-art-gen"
+		"build" : "/Users/gamae/Documents/GitHub/ascii-art-gen/cmake-build-debug",
+		"source" : "/Users/gamae/Documents/GitHub/ascii-art-gen"
 	},
 	"version" : 
 	{

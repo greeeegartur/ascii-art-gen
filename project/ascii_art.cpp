@@ -38,7 +38,7 @@ struct GifAnim {
 };
 
 
-//GIF support
+//GIF meetod
 void gifFrameWriter(void *user, struct GIF_WHDR *whdr) {
     static vector<uint8_t> canvas;
     static vector<uint8_t> prev_canvas;
@@ -55,12 +55,10 @@ void gifFrameWriter(void *user, struct GIF_WHDR *whdr) {
         prev_canvas.resize(canvas.size());
     }
 
-    // If disposal is "restore previous", save current canvas
     if (whdr->mode == GIF_PREV) {
         prev_canvas = canvas;
     }
 
-    // Draw current frame onto canvas
     for (int y = 0; y < whdr->fryd; ++y) {
         for (int x = 0; x < whdr->frxd; ++x) {
             int src_index = y * whdr->frxd + x;
@@ -69,7 +67,7 @@ void gifFrameWriter(void *user, struct GIF_WHDR *whdr) {
             int dst_index = (dst_y * full_w + dst_x) * 3;
 
             int palette_index = whdr->bptr[src_index];
-            if (palette_index == whdr->tran) continue; // skip transparent
+            if (palette_index == whdr->tran) continue;
 
             canvas[dst_index + 0] = whdr->cpal[palette_index].R;
             canvas[dst_index + 1] = whdr->cpal[palette_index].G;
@@ -77,12 +75,10 @@ void gifFrameWriter(void *user, struct GIF_WHDR *whdr) {
         }
     }
 
-    // Prepare resized buffer
     unsigned char *resized = new unsigned char[out_width * out_height * 3];
     stbir_resize_uint8_srgb(canvas.data(), full_w, full_h, 0,
                             resized, out_width, out_height, 0, STBIR_RGB);
 
-    // Convert to ASCII frame
     AsciiFrame frame;
     frame.delay_ms = whdr->time * 10;
 
@@ -99,9 +95,7 @@ void gifFrameWriter(void *user, struct GIF_WHDR *whdr) {
     anim->frames.push_back(frame);
     delete[] resized;
 
-    // Handle disposal modes
     if (whdr->mode == GIF_BKGD) {
-        // Clear the area where this frame was drawn
         for (int y = 0; y < whdr->fryd; ++y) {
             for (int x = 0; x < whdr->frxd; ++x) {
                 int dst_x = x + whdr->frxo;
@@ -113,7 +107,6 @@ void gifFrameWriter(void *user, struct GIF_WHDR *whdr) {
             }
         }
     } else if (whdr->mode == GIF_PREV) {
-        // Restore previous canvas
         canvas = prev_canvas;
     }
 }
@@ -134,12 +127,13 @@ void showProgress(int current, int total) {
     cout.flush();
 }
 
+//
 void title() {
-    cout << "\n\n\t\t|======================================|\n";
-    cout << "\t\t|            ASCII GEN v1.0.1          |\n";
-    cout << "\t\t|                                      |\n";
-    cout << "\t\t|   Mattias Antsov, Gregor Artur Mäe  |\n";
-    cout << "\t\t|======================================|\n\n";
+    cout << "\n\n\t\t╔══════════════════════════════════════╗\n";
+    cout << "\t\t║            ASCII GEN v1.0            ║\n";
+    cout << "\t\t║                                      ║\n";
+    cout << "\t\t║   Mattias Antsov, Gregor Artur Mäe   ║\n";
+    cout << "\t\t╚══════════════════════════════════════╝\n\n";
 }
 
 
@@ -162,6 +156,7 @@ int main() {
                   in_filename.substr(in_filename.size() - 4) == ".GIF");
 
 
+    // Laeb pikslite andmed ühte muutujasse, kontrollib GIF struktuuri
     if (!isGif) {
         unsigned char *probe = stbi_load(in_filename.c_str(), &width, &height, &channels, 3);
         if (!probe) {
@@ -170,11 +165,11 @@ int main() {
         }
         stbi_image_free(probe);
     } else {
-        width = 480;  // default GIF guess
-        height = 360;
+        width = 360;
+        height = 240;
     }
 
-    // -- AUTO WIDTH & HEIGHT CALC --
+    // Dünaamiline laius ja kõrgus ning selle kuvamine
     float aspect_ratio = 0.75f;
     int out_width = max(min(width / 4, 240), 60);
     int out_height = static_cast<int>((height * out_width * aspect_ratio) / width);
@@ -182,7 +177,9 @@ int main() {
     cout << "\n\tArvutatud mõõtmed: " << out_width << " x " << out_height
          << " (laius x kõrgus) – sobib enamikes tekstivaatajates\n";
 
-
+    // Laiuse/kõrguse määramise küsimine
+    // Kuna ASCII sümbolid pole ruudud (nagu on piksel), tuleb pikslite andmed muuta väiksemaks stb resize meetodiga,
+    // vastasel juhul vaikeparameetriga ilmuksid sümbolid vertikaalselt teineteise peal ning ASCII kunsti poleks näha
     string choice;
     cout << "\tKas soovid määrata laiuse ja kõrguse ise? [Y/N]: ";
     cin >> choice;
@@ -198,7 +195,7 @@ int main() {
     }
     cin.ignore();
 
-    
+    // Output faili nime küsimine, jätab samaks mis sisend kui jäetakse vahele
     cout << "\n\tSisesta väljundfaili nimi: ";
     getline(cin, out_filename);
     if (out_filename.empty()) {
@@ -208,9 +205,6 @@ int main() {
         out_filename += ".txt";
     }
 
-    // -----------------------------
-    // -- STATIC IMAGE PROCESSING --
-    // -----------------------------
     if (!isGif) {
         unsigned char *data = stbi_load(in_filename.c_str(), &width, &height, &channels, 3);
         if (!data) {
@@ -244,9 +238,7 @@ int main() {
         return 0;
     }
 
-    // ------------------------
-    // -- GIF IMAGE PROCESSING --
-    // ------------------------
+    // GIF integratsioon
     GifAnim anim;
     anim.width = out_width;
     anim.height = out_height;
@@ -269,11 +261,7 @@ int main() {
 
     if (animate == 'y' || animate == 'Y') {
         for (const auto &frame : anim.frames) {
-#ifdef _WIN32
-            system("cls");
-#else
             system("clear");
-#endif
             for (const auto &line : frame.lines)
                 cout << line << '\n';
             this_thread::sleep_for(chrono::milliseconds(frame.delay_ms));
