@@ -130,7 +130,7 @@ void showProgress(int current, int total) {
 //
 void title() {
     cout << "\n\n\t\t╔══════════════════════════════════════╗\n";
-    cout << "\t\t║            ASCII GEN v1.0            ║\n";
+    cout << "\t\t║            ASCII GEN v1.0.1          ║\n";
     cout << "\t\t║                                      ║\n";
     cout << "\t\t║   Mattias Antsov, Gregor Artur Mäe   ║\n";
     cout << "\t\t╚══════════════════════════════════════╝\n\n";
@@ -145,11 +145,13 @@ int main() {
     cout << "\tPalun sisesta failinimi (koos failimuutujaga): ";
     cin >> in_filename;
 
-    // Kontrollib faili olemasolu
+    // Kontrollib faili olemasolu, mac versioonil annab errori
+    /**
     if (!filesystem::exists(in_filename)) {
         cerr << "\tFaili \"" << in_filename << "\" ei leitud.\n";
         return 1;
     }
+    */
 
     bool isGif = in_filename.size() >= 4 &&
                  (in_filename.substr(in_filename.size() - 4) == ".gif" ||
